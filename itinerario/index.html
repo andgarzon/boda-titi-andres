@@ -185,6 +185,20 @@ h1 em{font-style:normal;color:var(--truss)}
 .fcard .big span{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;font-weight:700;color:var(--muted)}
 .fcard .mates{font-size:.9rem;color:var(--muted);text-align:left}
 .fcard .mates b{color:var(--ink)}
+.fmap{margin:4px -6px 0;border-radius:10px;overflow:hidden;border:1px solid var(--line,#ddd);background:var(--paper)}
+.fmap svg{display:block;width:100%;height:auto}
+.fmap .mt .body{fill:var(--cream);stroke:var(--chair-line);stroke-width:1.1}
+.fmap .mt .c{fill:#fff;stroke:var(--chair-line);stroke-width:.8}
+.fmap .mt text{font-weight:700;fill:var(--ink)}
+.fmap .mt{opacity:.55}
+.fmap .mt.me{opacity:1}
+.fmap .mt.me .body{fill:var(--truss);stroke:var(--truss)}
+.fmap .mt.me .c{fill:var(--truss-soft);stroke:var(--truss)}
+.fmap .mt.me text{fill:#fff}
+.fmap .ring{fill:none;stroke:var(--truss);stroke-width:4;animation:fpulse 1.6s ease-in-out infinite}
+@keyframes fpulse{50%{stroke-opacity:.25}}
+@media (prefers-reduced-motion:reduce){.fmap .ring{animation:none}}
+.fmap figcaption{font-size:.8rem;color:var(--muted);padding:6px 10px;border-top:1px solid var(--line,#ddd)}
 .fbtns{display:flex;gap:8px;flex-wrap:wrap}.fbtns .btn{flex:1;min-height:46px;font-size:1rem}
 .flink[hidden]{display:none}
 .flink{align-self:center;border:0;background:transparent;color:var(--truss);font:inherit;font-weight:700;text-decoration:underline;cursor:pointer;padding:10px}
@@ -544,7 +558,7 @@ body.ro .addbtn,body.ro .chip .edit,body.ro .chip .del,body.ro .stepper button,b
 <script>
 const GUESTS = [];
 /* Public copy: a saved picture of the seating, shown read-only to anyone with the link. null on the editing page. */
-const SNAP = {"at": 1792623289704, "seats": {}, "names": {}, "extra": {}, "absent": {}, "tables": {}, "gmember": {}, "gname": {}};
+const SNAP = {"at": 1792697335805, "seats": {}, "names": {}, "extra": {}, "absent": {}, "tables": {}, "gmember": {}, "gname": {}};
 const SITE = 'itinerario';
 if(SITE)document.documentElement.classList.add('site');
 /* Wedding-day timeline (from "CUADRO DE TIEMPOS", tab TIMELINE) and the forecast saved on Oct 21 */
@@ -1350,11 +1364,29 @@ function finderCard(id){
     box.append(el('div',{class:'big'},el('div',{},el('b',{text:a.t==='N'?'Novios':a.t}),el('span',{text:a.t==='N'?'Mesa de los novios':'Mesa'}))));
     const mates=seatMap(a.t).arr.filter(x=>x&&x!==id).map(nameOf);
     if(mates.length)box.append(el('div',{class:'mates'},el('b',{text:'En tu mesa: '}),mates.join(', ')));
+    if(T.some(x=>x[0]===a.t)){const f=el('figure',{class:'fmap'});f.innerHTML=miniPlan(a.t)+`<figcaption>Tu mesa está resaltada en el plano de la carpa.</figcaption>`;box.append(f)}
   }
   const btns=el('div',{class:'fbtns'});
   if(a&&!SNAP){const v=el('button',{type:'button',class:'btn primary',text:'Ver en el plano'});v.onclick=()=>{showFinder(false);openT=a.t;render();zoomToTable(a.t)};btns.append(v)}
   const back=el('button',{type:'button',class:'btn',text:'Buscar otro nombre'});back.onclick=()=>{fSel=null;$('#fq').value='';renderFinder();$('#fq').focus()};btns.append(back);
   box.append(btns);return box;
+}
+/* tent-only plan for the guest finder, with the guest's table highlighted */
+function miniPlan(t){
+  const cs=getComputedStyle(document.documentElement);
+  const stat=buildStatic().replace(/var\((--[\w-]+)\)/g,(m,n)=>cs.getPropertyValue(n).trim()||m)
+    .replace(/id="(truss|checks|ah)"/g,'id="m$1"').replace(/url\(#(truss|checks|ah)\)/g,'url(#m$1)').replace('<g id="tables"></g>','');
+  let tb='',ring='';
+  for(const [id,x,y,shape,base,heads] of T){
+    const g=geom(shape,cap(id),base,heads),me=id===t;
+    tb+=`<g class="mt${me?' me':''}" transform="translate(${x} ${y})">`;
+    g.ch.forEach(([cx,cy,cw,chh,rot,px,py])=>{tb+=`<rect class="c" x="${cx}" y="${cy}" width="${cw}" height="${chh}"${rot?` transform="rotate(${rot} ${px} ${py})"`:''}/>`});
+    tb+=g.body;
+    tb+=g.novios?`<text text-anchor="middle" y="6" font-size="17">MESA NOVIOS</text>`:`<text text-anchor="middle" y="${g.round||shape==='sq'?3:4}" dy=".3em" font-size="${g.no}">${id}</text>`;
+    tb+='</g>';
+    if(me){const [hx,hy,hw,hh]=g.halo;ring=g.round?`<circle class="ring" cx="${x}" cy="${y}" r="${hw/2+8}"/>`:`<rect class="ring" x="${x+hx-8}" y="${y+hy-8}" width="${hw+16}" height="${hh+16}" rx="8"/>`}
+  }
+  return `<svg viewBox="428 52 736 1020" role="img" aria-label="Plano de la carpa con la mesa ${t==='N'?'de los novios':t} resaltada">${stat}${tb}${ring}</svg>`;
 }
 function renderFinder(){
   const res=$('#fres');res.replaceChildren();
