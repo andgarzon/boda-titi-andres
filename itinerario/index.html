@@ -559,7 +559,7 @@ body.ro .addbtn,body.ro .chip .edit,body.ro .chip .del,body.ro .stepper button,b
 <script>
 const GUESTS = [];
 /* Public copy: a saved picture of the seating, shown read-only to anyone with the link. null on the editing page. */
-const SNAP = {"at": 1792773044883, "seats": {}, "names": {}, "extra": {}, "absent": {}, "tables": {}, "gmember": {}, "gname": {}};
+const SNAP = {"at": 1792773675746, "seats": {}, "names": {}, "extra": {}, "absent": {}, "tables": {}, "gmember": {}, "gname": {}};
 const SITE = 'itinerario';
 if(SITE)document.documentElement.classList.add(SITE==='app'?'siteapp':'site');
 /* Wedding-day timeline (from "CUADRO DE TIEMPOS", tab TIMELINE) and the forecast saved on Oct 21 */
@@ -1363,8 +1363,6 @@ function finderCard(id){
   if(!a){box.append(el('p',{class:'fhint',text:'Todavía no tienes una mesa asignada. Pregunta en la entrada y te ayudamos.'}))}
   else{
     box.append(el('div',{class:'big'},el('div',{},el('b',{text:a.t==='N'?'Novios':a.t}),el('span',{text:a.t==='N'?'Mesa de los novios':'Mesa'}))));
-    const mates=seatMap(a.t).arr.filter(x=>x&&x!==id).map(nameOf);
-    if(mates.length)box.append(el('div',{class:'mates'},el('b',{text:'En tu mesa: '}),mates.join(', ')));
     if(T.some(x=>x[0]===a.t)){const f=el('figure',{class:'fmap'});f.innerHTML=miniPlan(a.t)+`<figcaption>Tu mesa está resaltada en el plano de la carpa.</figcaption>`;box.append(f)}
   }
   const btns=el('div',{class:'fbtns'});
