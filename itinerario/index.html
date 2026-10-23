@@ -574,7 +574,7 @@ body.ro .addbtn,body.ro .chip .edit,body.ro .chip .del,body.ro .stepper button,b
 <script>
 const GUESTS = [];
 /* Public copy: a saved picture of the seating, shown read-only to anyone with the link. null on the editing page. */
-const SNAP = {"at": 1792775332529, "seats": {}, "names": {}, "extra": {}, "absent": {}, "tables": {}, "gmember": {}, "gname": {}};
+const SNAP = {"at": 1792775477690, "seats": {}, "names": {}, "extra": {}, "absent": {}, "tables": {}, "gmember": {}, "gname": {}};
 const SITE = 'itinerario';
 if(SITE)document.documentElement.classList.add(SITE==='app'?'siteapp':'site','site-'+SITE);
 /* Wedding-day timeline (from "CUADRO DE TIEMPOS", tab TIMELINE) and the forecast saved on Oct 21 */
@@ -600,7 +600,7 @@ const T = [
  ['32',820,775,'lg',10],['26',996,775,'rd',10],['38',610,828,'sq',8],['29',905,828,'sq',8],
  ['41',518,880,'rd',10],['35',701,876,'lg',10],['23',1090,868,'rd',10],
  ['31',820,932,'lg',18],['37',604,938,'sq',8],['30',910,940,'sq',8],['25',1003,932,'lg',18],
- ['42',514,985,'lg',12,1],['36',700,983,'rd',10],['24',1097,970,'lg',10]
+ ['42',514,985,'lg',10],['36',700,983,'rd',10],['24',1097,970,'lg',10]
 ];
 /* guests added in the app live in the store (collection "extra") and join the official list here */
 let extra={}, absent={}, gmember={}, gname={}, PRESENT=[], ALL=[], byId={}, groups=[], groupOf={};
