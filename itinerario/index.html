@@ -330,8 +330,6 @@ body.ro .chip .out,body.ro .chip .back{display:none}
 /* long tables: left column of chairs, then right column, like the plan */
 .seats.cols{grid-auto-flow:column}
 .seats.extra-list{margin-top:6px}
-.seats.headseats{margin-top:6px}
-.seat .hlabel{order:9;font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700;white-space:nowrap}
 .seat{display:flex;align-items:center;gap:6px;min-height:32px;padding:4px 8px;border:1px dashed var(--chair-line);border-radius:4px;font-size:.84rem;cursor:pointer;min-width:0;background:var(--chair)}
 .seat .n{font-variant-numeric:tabular-nums;color:var(--muted);font-size:.72rem;width:16px;flex:none;font-weight:700}
 .seat .who{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -558,7 +556,7 @@ body.ro .addbtn,body.ro .chip .edit,body.ro .chip .del,body.ro .stepper button,b
 <script>
 const GUESTS = [];
 /* Public copy: a saved picture of the seating, shown read-only to anyone with the link. null on the editing page. */
-const SNAP = {"at": 1792771705147, "seats": {}, "names": {}, "extra": {}, "absent": {}, "tables": {}, "gmember": {}, "gname": {}};
+const SNAP = {"at": 1792771803985, "seats": {}, "names": {}, "extra": {}, "absent": {}, "tables": {}, "gmember": {}, "gname": {}};
 const SITE = 'itinerario';
 if(SITE)document.documentElement.classList.add('site');
 /* Wedding-day timeline (from "CUADRO DE TIEMPOS", tab TIMELINE) and the forecast saved on Oct 21 */
@@ -910,10 +908,9 @@ function renderDetail(){
   plus.onclick=()=>{if(guard())return;capOver[openT]=c+1;persistCap(openT);render()};
   d.append(el('span',{class:'ptitle',text:'Mesa abierta'}),el('h2',{text:tableName(openT)}),
     el('div',{class:'dmeta'},el('span',{text:`${used} de ${c} puestos ocupados`}),el('span',{class:'stepper'},minus,el('span',{text:'Puestos'}),plus)));
-  const trow=T.find(x=>x[0]===openT),shape=trow[3],heads=trow[5]?2:0,byCols=shape==='lg'||shape==='nv';
+  const shape=T.find(x=>x[0]===openT)[3],byCols=shape==='lg'||shape==='nv';
   const grid=el('div',{class:'seats'+(byCols?' cols':'')});
-  if(byCols)grid.style.gridTemplateRows=`repeat(${Math.ceil((c-heads)/2)},auto)`;
-  const headGrid=el('div',{class:'seats headseats'});
+  if(byCols)grid.style.gridTemplateRows=`repeat(${Math.ceil(c/2)},auto)`;
   const over=el('div',{class:'seats extra-list'});
   arr.forEach((id,i)=>{
     const s=el('div',{class:'seat '+(id?'taken':'free'),'data-drop':`seat:${openT}:${i}`,...(id?{'data-drag':'guest:'+id,'data-tip':tipFor(id)}:{})},
@@ -921,14 +918,14 @@ function renderDetail(){
     if(id){const ed=el('button',{type:'button',class:'sedit','aria-label':'Editar nombre, mesa y puesto',title:'Editar (o doble clic)',text:'✎'});ed.onclick=e=>{e.stopPropagation();startEdit(id,'detail')};s.append(ed);
       const x=el('button',{type:'button',class:'x','aria-label':'Quitar de la mesa',text:'×'});x.onclick=e=>{e.stopPropagation();unseat([id])};s.append(x)}
     if(id&&editing===id&&editWhere==='detail')s.classList.add('editing');
-    if(heads&&i>=c-heads){s.prepend(el('span',{class:'hlabel',text:i===c-2?'Cabecera arriba':'Cabecera abajo'}));headGrid.append(s)}else grid.append(s);
+    grid.append(s);
   });
   extra.forEach(id=>{
     const s=el('div',{class:'seat taken extra','data-drag':'guest:'+id,title:'Sin silla: la mesa tiene más personas que puestos'},el('span',{class:'n',text:'!'}),el('span',{class:'who',text:nameOf(id)}));
     const x=el('button',{type:'button',class:'x','aria-label':'Quitar de la mesa',text:'×'});x.onclick=e=>{e.stopPropagation();unseat([id])};s.append(x);over.append(s);
   });
   if(editing&&editWhere==='detail'&&assign[editing]&&assign[editing].t===openT)d.append(editBox(editing));
-  d.append(grid);if(heads)d.append(headGrid);if(extra.length)d.append(over);
+  d.append(grid);if(extra.length)d.append(over);
 }
 function render(){if(!$('#finder').hidden)renderFinder();renderStats();if(!editing||editWhere!=='list')renderList();renderPlan();if(!editing||editWhere!=='detail')renderDetail();if(!$('#printView').hidden)renderPrint()}
 
